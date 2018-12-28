@@ -6,7 +6,7 @@ from FWCore.ParameterSet.VarParsing import VarParsing
 options = VarParsing ('analysis')
 options.parseArguments()
 
-process = cms.Process('AdvancedMultifit')
+process = cms.Process('ECALNoise')
 
 # import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')
@@ -49,12 +49,10 @@ from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, '102X_upgrade2018_realistic_v12', '')
 
 
-process.TreeProducerPFrechits = cms.EDAnalyzer('TreeProducerPFrechits',
-                            ParticleFlowRecHitECALCollectionTag     = cms.InputTag("particleFlowRecHitECAL:Cleaned"),
-                            ebSrFlagLabel     = cms.InputTag("ecalDigis"),
-                            eeSrFlagLabel     = cms.InputTag("ecalDigis"),
-                            pfClusterTag = cms.InputTag("particleFlowClusterECAL"),
-                           )
+process.TreeProducerNoise = cms.EDAnalyzer('TreeProducerNoise',
+                            EcalUncalibRecHitsEBCollection = cms.InputTag("ecalRecHit",  "EcalRecHitsEB"),
+                            EcalUncalibRecHitsEECollection = cms.InputTag("ecalRecHit",  "EcalRecHitsEE"),
+                            )
 
 
 #reducedEgamma"             "reducedEBRecHits
@@ -74,12 +72,12 @@ process.source = cms.Source("PoolSource",
                                 )
 
 
-process.TreeProducerPFrechits_step = cms.Path(process.TreeProducerPFrechits)
+process.TreeProducerNoise_step = cms.Path(process.TreeProducerNoise)
 process.endjob_step = cms.EndPath(process.endOfProcess)
 
 
 process.schedule = cms.Schedule(
-                                process.TreeProducerPFrechits_step, 
+                                process.TreeProducerNoise_step, 
                                 process.endjob_step
                                 )
 
