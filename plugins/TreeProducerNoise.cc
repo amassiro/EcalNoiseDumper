@@ -146,8 +146,8 @@ private:
   
   // ----------member data ---------------------------
  
-  edm::EDGetTokenT<EcalUncalibratedRecHitCollection> _token_ebrechits;
-  edm::EDGetTokenT<EcalUncalibratedRecHitCollection> _token_eerechits;
+  edm::EDGetTokenT<EcalRecHitCollection> _token_ebrechits;
+  edm::EDGetTokenT<EcalRecHitCollection> _token_eerechits;
   
   
   
@@ -190,8 +190,8 @@ TreeProducerNoise::TreeProducerNoise(const edm::ParameterSet& iConfig)
   usesResource("TFileService");
   edm::Service<TFileService> fs;
   
-  _token_ebrechits = consumes<EcalUncalibratedRecHitCollection>(iConfig.getParameter<edm::InputTag>("EcalUncalibRecHitsEBCollection"));
-  _token_eerechits = consumes<EcalUncalibratedRecHitCollection>(iConfig.getParameter<edm::InputTag>("EcalUncalibRecHitsEECollection"));
+  _token_ebrechits = consumes<EcalRecHitCollection>(iConfig.getParameter<edm::InputTag>("EcalRecHitsEBCollection"));
+  _token_eerechits = consumes<EcalRecHitCollection>(iConfig.getParameter<edm::InputTag>("EcalRecHitsEECollection"));
   
   
   outTree = fs->make<TTree>("tree","tree");
@@ -229,10 +229,10 @@ TreeProducerNoise::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   
   //---- rechits
   
-  edm::Handle<EcalUncalibratedRecHitCollection> ebrechithandle;
-  const EcalUncalibratedRecHitCollection *ebrechits = NULL;
-  edm::Handle<EcalUncalibratedRecHitCollection> eerechithandle;
-  const EcalUncalibratedRecHitCollection *eerechits = NULL;
+  edm::Handle<EcalRecHitCollection> ebrechithandle;
+  const EcalRecHitCollection *ebrechits = NULL;
+  edm::Handle<EcalRecHitCollection> eerechithandle;
+  const EcalRecHitCollection *eerechits = NULL;
   
   iEvent.getByToken(_token_ebrechits,ebrechithandle);
   ebrechits = ebrechithandle.product();
@@ -260,15 +260,17 @@ TreeProducerNoise::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   const CaloGeometry *geometry = pGeometry.product();
   
   
-  for (EcalUncalibratedRecHitCollection::const_iterator itrechit = ebrechits->begin(); itrechit != ebrechits->end(); itrechit++ ) {
-    _energy_EB[EBDetId(itrechit->id()).hashedIndex()] =  itrechit->amplitude();
+  for (EcalRecHitCollection::const_iterator itrechit = ebrechits->begin(); itrechit != ebrechits->end(); itrechit++ ) {
+    //     _energy_EB[EBDetId(itrechit->id()).hashedIndex()] =  itrechit->amplitude();  //----> only in EcalUncalibratedRecHit
+    _energy_EB[EBDetId(itrechit->id()).hashedIndex()] =  itrechit->energy();
     _ieta[EBDetId(itrechit->id()).hashedIndex()] = EBDetId(itrechit->id()).ieta();
     _iphi[EBDetId(itrechit->id()).hashedIndex()] = EBDetId(itrechit->id()).iphi();
   }
   
   
-  for (EcalUncalibratedRecHitCollection::const_iterator itrechit = eerechits->begin(); itrechit != eerechits->end(); itrechit++ ) {
-    _energy_EE[EEDetId(itrechit->id()).hashedIndex()] =  itrechit->amplitude();
+  for (EcalRecHitCollection::const_iterator itrechit = eerechits->begin(); itrechit != eerechits->end(); itrechit++ ) {
+//     _energy_EE[EEDetId(itrechit->id()).hashedIndex()] =  itrechit->amplitude();  //----> only in EcalUncalibratedRecHit
+    _energy_EE[EEDetId(itrechit->id()).hashedIndex()] =  itrechit->energy();
     _ix[EEDetId(itrechit->id()).hashedIndex()] = EEDetId(itrechit->id()).ix();
     _iy[EEDetId(itrechit->id()).hashedIndex()] = EEDetId(itrechit->id()).iy();
     _iz[EEDetId(itrechit->id()).hashedIndex()] = EEDetId(itrechit->id()).zside();
