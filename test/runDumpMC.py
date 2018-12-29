@@ -50,8 +50,37 @@ process.GlobalTag = GlobalTag(process.GlobalTag, '102X_upgrade2018_realistic_v12
 
 
 process.TreeProducerNoise = cms.EDAnalyzer('TreeProducerNoise',
-                            EcalRecHitsEBCollection = cms.InputTag("ecalRecHit",  "EcalRecHitsEB"),
-                            EcalRecHitsEECollection = cms.InputTag("ecalRecHit",  "EcalRecHitsEE"),
+                            #EcalRecHitsEBCollection = cms.InputTag("ecalRecHit",  "EcalRecHitsEB"),
+                            #EcalRecHitsEECollection = cms.InputTag("ecalRecHit",  "EcalRecHitsEE"),
+
+                            EcalRecHitsEBCollection = cms.InputTag("hltEcalRecHit",  "EcalRecHitsEB"),
+                            EcalRecHitsEECollection = cms.InputTag("hltEcalRecHit",  "EcalRecHitsEE"),
+
+#edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> >    "hltEcalRecHit"             "EcalRecHitsEB"   "HLT"         
+#edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> >    "hltEcalRecHit"             "EcalRecHitsEE"   "HLT"         
+
+
+                            
+                            #EBDigiCollection = cms.InputTag("selectDigi",  "selectedEcalEBDigiCollection"),
+                            #EEDigiCollection = cms.InputTag("selectDigi",  "selectedEcalEEDigiCollection"),
+
+                            EBDigiCollection = cms.InputTag("ecalDigis",  "ebDigis"),
+                            EEDigiCollection = cms.InputTag("ecalDigis",  "eeDigis"),
+                            
+                            #
+                            # this is not the collection I am looking for! They should be NOT selected or you bias the estimation of the RMS!
+                            #
+                            #EBDigiCollection                      "selectDigi"                "selectedEcalEBDigiCollection"   "RECO"    
+                            #EEDigiCollection                      "selectDigi"                "selectedEcalEEDigiCollection"   "RECO"    
+                            # 
+                            # I want these ones!
+                            #
+                            # EBDigiCollection                      "ecalDigis"                 "ebDigis"         "PulseTree"   
+                            # EEDigiCollection                      "ecalDigis"                 "eeDigis"         "PulseTree"   
+                            #
+                            #
+                            
+
                             )
 
 

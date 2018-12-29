@@ -152,17 +152,22 @@ private:
   edm::EDGetTokenT<EcalRecHitCollection> _token_ebrechits;
   edm::EDGetTokenT<EcalRecHitCollection> _token_eerechits;
   
+  edm::EDGetTokenT<EBDigiCollection> _token_ebdigi;
+  edm::EDGetTokenT<EEDigiCollection> _token_eedigi;
+  
   
   
   TTree *outTree;
   
   float _LaserCorrection_EB[61200];
   float _energy_EB[61200];
+  float _rms_EB[61200];
   int   _ieta[61200];
   int   _iphi[61200];
 
   float _LaserCorrection_EE[14648];
   float _energy_EE[14648];
+  float _rms_EE[14648];
   int   _ix[14648];
   int   _iy[14648];
   int   _iz[14648];
@@ -198,15 +203,22 @@ TreeProducerNoise::TreeProducerNoise(const edm::ParameterSet& iConfig)
   _token_ebrechits = consumes<EcalRecHitCollection>(iConfig.getParameter<edm::InputTag>("EcalRecHitsEBCollection"));
   _token_eerechits = consumes<EcalRecHitCollection>(iConfig.getParameter<edm::InputTag>("EcalRecHitsEECollection"));
   
+  _token_ebdigi = consumes<EBDigiCollection>(iConfig.getParameter<edm::InputTag>("EBDigiCollection"));
+  _token_eedigi = consumes<EEDigiCollection>(iConfig.getParameter<edm::InputTag>("EEDigiCollection"));
+  
+  
+  
   
   outTree = fs->make<TTree>("tree","tree");
   
   outTree->Branch("LaserCorrection_EB",   _LaserCorrection_EB,    "LaserCorrection_EB[61200]/F");
+  outTree->Branch("rms_EB",         _rms_EB,    "rms_EB[61200]/F");
   outTree->Branch("energy_EB",   _energy_EB,    "energy_EB[61200]/F");
   outTree->Branch("ieta",             _ieta,    "ieta[61200]/I");
   outTree->Branch("iphi",             _iphi,    "iphi[61200]/I");
   
   outTree->Branch("LaserCorrection_EE",   _LaserCorrection_EE,    "LaserCorrection_EE[14648]/F");
+  outTree->Branch("rms_EE",         _rms_EE,    "rms_EE[14648]/F");
   outTree->Branch("energy_EE",   _energy_EE,    "energy_EE[14648]/F");
   outTree->Branch("ix",                 _ix,    "ix[14648]/I");
   outTree->Branch("iy",                 _iy,    "iy[14648]/I");
@@ -245,16 +257,32 @@ TreeProducerNoise::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   ebrechits = ebrechithandle.product();
   iEvent.getByToken(_token_eerechits,eerechithandle);
   eerechits = eerechithandle.product();
+ 
+  
+  //---- digis
+  edm::Handle<EBDigiCollection> ebdigihandle;
+  const EBDigiCollection *ebdigis = NULL;
+  edm::Handle<EEDigiCollection> eedigihandle;
+  const EEDigiCollection *eedigis = NULL;
+  
+  iEvent.getByToken(_token_ebdigi,ebdigihandle);
+  ebdigis = ebdigihandle.product();
+  iEvent.getByToken(_token_eedigi,eedigihandle);
+  eedigis = eedigihandle.product();
+  
+  
   
   //---- setup default
   for (int ixtal=0; ixtal < 61200; ixtal++) {
     _LaserCorrection_EB[ixtal] = -999;
+    _rms_EB[ixtal] = -999;
     _energy_EB[ixtal] = -999;
     _ieta[ixtal] = -999;
     _iphi[ixtal] = -999;
   }
   for (int ixtal=0; ixtal < 14648; ixtal++) {
     _LaserCorrection_EE[ixtal] = -999;
+    _rms_EE[ixtal] = -999;
     _energy_EE[ixtal] = -999;
     _ix[ixtal] = -999;
     _iy[ixtal] = -999;
@@ -294,7 +322,55 @@ TreeProducerNoise::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     _iz[EEDetId(itrechit->id()).hashedIndex()] = EEDetId(itrechit->id()).zside();
     _LaserCorrection_EE[EEDetId(itrechit->id()).hashedIndex()] = pLaser -> getLaserCorrection( EEDetId(itrechit->id()), iEvent.time() );
   }
-  
+ 
+ 
+ 
+ 
+ //---- get RMS noise
+ 
+ for (EBDigiCollection::const_iterator itdigi = ebdigis->begin(); itdigi != ebdigis->end(); itdigi++ ) {
+   
+   float sum_square = 0;
+   float sum        = 0;
+   
+//    std::cout << " itdigi->size() = " << itdigi->size() << std::endl; // --> it is 10
+   
+   //                                                           0xFFF = 4095
+   for (int iSample = 0; iSample < 10; iSample++) {
+     float value = ( int( (*itdigi) [iSample] ) & 0xFFF );
+//      float value = ( ( (*itdigi) [iSample] ).adc() );
+     sum_square += (value*value) ;
+     sum        +=  value ;
+   }
+   
+//    std::cout << " hashindex = " << ((EBDetId&)((*itdigi))).hashedIndex() << std::endl;
+   _rms_EB[ ((EBDetId&)((*itdigi))).hashedIndex() ] =  sqrt(sum_square/10. - sum/10.*sum/10.);
+   
+//    std::cout << " rms eb = " << sqrt(sum_square/10. - sum/10.*sum/10.) << std::endl;   
+ }
+ 
+ 
+ for (EEDigiCollection::const_iterator itdigi = eedigis->begin(); itdigi != eedigis->end(); itdigi++ ) {
+
+   float sum_square = 0;
+   float sum        = 0;
+   
+   //                                                           0xFFF = 4095
+   for (int iSample = 0; iSample < 10; iSample++) {
+     float value = ( int( (*itdigi) [iSample] ) & 0xFFF );
+     sum_square += (value*value) ;
+     sum        +=  value ;
+   }
+   _rms_EE[ ((EEDetId&)((*itdigi))).hashedIndex() ] =  sqrt(sum_square/10. - sum/10.*sum/10.);
+//    std::cout << " rms ee = " << sqrt(sum_square/10. - sum/10.*sum/10.) << std::endl;   
+   
+ }
+ 
+ 
+ 
+ 
+ 
+ 
   outTree->Fill();
   
 }

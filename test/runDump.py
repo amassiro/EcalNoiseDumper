@@ -52,6 +52,13 @@ process.GlobalTag = GlobalTag(process.GlobalTag, '101X_dataRun2_Prompt_v9', '')
 process.TreeProducerNoise = cms.EDAnalyzer('TreeProducerNoise',
                             EcalRecHitsEBCollection = cms.InputTag("ecalRecHit",  "EcalRecHitsEB"),
                             EcalRecHitsEECollection = cms.InputTag("ecalRecHit",  "EcalRecHitsEE"),
+
+                            EBDigiCollection = cms.InputTag("selectDigi",  "selectedEcalEBDigiCollection"),
+                            EEDigiCollection = cms.InputTag("selectDigi",  "selectedEcalEEDigiCollection"),
+                            
+                            #EBDigiCollection                      "selectDigi"                "selectedEcalEBDigiCollection"   "RECO"    
+                            #EEDigiCollection                      "selectDigi"                "selectedEcalEEDigiCollection"   "RECO"    
+
                            )
 
 
