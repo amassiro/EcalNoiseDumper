@@ -102,6 +102,9 @@
 #include "Geometry/CaloTopology/interface/EcalTrigTowerConstituentsMap.h"
 
 
+//---- for Laser Correction 
+#include "CalibCalorimetry/EcalLaserCorrection/interface/EcalLaserDbService.h"
+#include "CalibCalorimetry/EcalLaserCorrection/interface/EcalLaserDbRecord.h"
 
 
 
@@ -153,10 +156,12 @@ private:
   
   TTree *outTree;
   
+  float _LaserCorrection_EB[61200];
   float _energy_EB[61200];
   int   _ieta[61200];
   int   _iphi[61200];
 
+  float _LaserCorrection_EE[14648];
   float _energy_EE[14648];
   int   _ix[14648];
   int   _iy[14648];
@@ -196,10 +201,12 @@ TreeProducerNoise::TreeProducerNoise(const edm::ParameterSet& iConfig)
   
   outTree = fs->make<TTree>("tree","tree");
   
+  outTree->Branch("LaserCorrection_EB",   _LaserCorrection_EB,    "LaserCorrection_EB[61200]/F");
   outTree->Branch("energy_EB",   _energy_EB,    "energy_EB[61200]/F");
   outTree->Branch("ieta",             _ieta,    "ieta[61200]/I");
   outTree->Branch("iphi",             _iphi,    "iphi[61200]/I");
   
+  outTree->Branch("LaserCorrection_EE",   _LaserCorrection_EE,    "LaserCorrection_EE[14648]/F");
   outTree->Branch("energy_EE",   _energy_EE,    "energy_EE[14648]/F");
   outTree->Branch("ix",                 _ix,    "ix[14648]/I");
   outTree->Branch("iy",                 _iy,    "iy[14648]/I");
@@ -241,11 +248,13 @@ TreeProducerNoise::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   
   //---- setup default
   for (int ixtal=0; ixtal < 61200; ixtal++) {
+    _LaserCorrection_EB[ixtal] = -999;
     _energy_EB[ixtal] = -999;
     _ieta[ixtal] = -999;
     _iphi[ixtal] = -999;
   }
   for (int ixtal=0; ixtal < 14648; ixtal++) {
+    _LaserCorrection_EE[ixtal] = -999;
     _energy_EE[ixtal] = -999;
     _ix[ixtal] = -999;
     _iy[ixtal] = -999;
@@ -255,16 +264,25 @@ TreeProducerNoise::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   
   //---- geometry 
   
-  edm::ESHandle<CaloGeometry> pGeometry;
-  iSetup.get<CaloGeometryRecord>().get(pGeometry);
-  const CaloGeometry *geometry = pGeometry.product();
+//   edm::ESHandle<CaloGeometry> pGeometry;
+//   iSetup.get<CaloGeometryRecord>().get(pGeometry);
+//   const CaloGeometry *geometry = pGeometry.product();
+  
+  
+  // Laser corrections
+  edm::ESHandle<EcalLaserDbService> pLaser;
+  iSetup.get<EcalLaserDbRecord>().get( pLaser );
+  
   
   
   for (EcalRecHitCollection::const_iterator itrechit = ebrechits->begin(); itrechit != ebrechits->end(); itrechit++ ) {
-    //     _energy_EB[EBDetId(itrechit->id()).hashedIndex()] =  itrechit->amplitude();  //----> only in EcalUncalibratedRecHit
+//     _energy_EB[EBDetId(itrechit->id()).hashedIndex()] =  itrechit->amplitude();  //----> only in EcalUncalibratedRecHit
     _energy_EB[EBDetId(itrechit->id()).hashedIndex()] =  itrechit->energy();
     _ieta[EBDetId(itrechit->id()).hashedIndex()] = EBDetId(itrechit->id()).ieta();
-    _iphi[EBDetId(itrechit->id()).hashedIndex()] = EBDetId(itrechit->id()).iphi();
+    _iphi[EBDetId(itrechit->id()).hashedIndex()] = EBDetId(itrechit->id()).iphi();    
+    _LaserCorrection_EB[EBDetId(itrechit->id()).hashedIndex()] = pLaser -> getLaserCorrection( EBDetId(itrechit->id()), iEvent.time() );
+    
+    
   }
   
   
@@ -274,7 +292,7 @@ TreeProducerNoise::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     _ix[EEDetId(itrechit->id()).hashedIndex()] = EEDetId(itrechit->id()).ix();
     _iy[EEDetId(itrechit->id()).hashedIndex()] = EEDetId(itrechit->id()).iy();
     _iz[EEDetId(itrechit->id()).hashedIndex()] = EEDetId(itrechit->id()).zside();
-    
+    _LaserCorrection_EE[EEDetId(itrechit->id()).hashedIndex()] = pLaser -> getLaserCorrection( EEDetId(itrechit->id()), iEvent.time() );
   }
   
   outTree->Fill();

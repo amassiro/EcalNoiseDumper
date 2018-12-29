@@ -33,8 +33,15 @@ Run
     tree ->Draw("iy:(ix+100*(iz>0))>>h_num(200,0,200,100,0,100", "(energy_EE>=0)", "colz");
 
     
+    tree ->Draw("iphi:ieta>>h(170,-85,85,360,0,360", "LaserCorrection_EB*(energy_EB>=0)", "colz");
+    tree ->Draw("iphi:ieta>>h_num(170,-85,85,360,0,360", "(energy_EB>=0)", "colz");
     
+    tree ->Draw("iy:(ix+100*(iz>0))>>h(200,0,200,100,0,100", "LaserCorrection_EE*(LaserCorrection_EE>=0)", "colz");
+    tree ->Draw("iy:(ix+100*(iz>0))>>h_num(200,0,200,100,0,100", "(LaserCorrection_EE>=0)", "colz");
+
     
-    
-    
-    
+    tree ->Draw("iphi:ieta>>h(170,-85,85,360,0,360", "energy_EB/LaserCorrection_EB*(energy_EB>=0)", "colz");
+    tree ->Draw("iphi:ieta>>h_num(170,-85,85,360,0,360", "(energy_EB>=0)", "colz");
+
+    tree ->Draw("iy:(ix+100*(iz>0))>>h(200,0,200,100,0,100", "energy_EE/LaserCorrection_EE*(energy_EE>=0)", "colz");
+    tree ->Draw("iy:(ix+100*(iz>0))>>h_num(200,0,200,100,0,100", "(energy_EE>=0)", "colz");
