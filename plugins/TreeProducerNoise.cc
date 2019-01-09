@@ -374,7 +374,7 @@ TreeProducerNoise::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
    _rms_EE[ ((EEDetId&)((*itdigi))).hashedIndex() ] =  sqrt(sum_square/10. - sum/10.*sum/10.);
 //    std::cout << " rms ee = " << sqrt(sum_square/10. - sum/10.*sum/10.) << std::endl;   
 
-   _histo_0_rms_EB[ ((EEDetId&)((*itdigi))).hashedIndex() ] -> Fill (  ( int( (*itdigi) [0] ) & 0xFFF ) );    
+   _histo_0_rms_EE[ ((EEDetId&)((*itdigi))).hashedIndex() ] -> Fill (  ( int( (*itdigi) [0] ) & 0xFFF ) );    
    
  }
  
