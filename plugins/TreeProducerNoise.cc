@@ -157,7 +157,7 @@ private:
   
   
   
-  TTree *outTree;
+  TTree *_outTree;
   
   float _LaserCorrection_EB[61200];
   float _energy_EB[61200];
@@ -175,6 +175,10 @@ private:
   
   //---- reconstructed energy
   TH1F* histo_energy[61200+14648];
+
+  //---- rms for EE and EB
+  TH1F* _histo_0_rms_EB[61200];
+  TH1F* _histo_0_rms_EE[14648];
   
 };
 
@@ -207,22 +211,29 @@ TreeProducerNoise::TreeProducerNoise(const edm::ParameterSet& iConfig)
   _token_eedigi = consumes<EEDigiCollection>(iConfig.getParameter<edm::InputTag>("EEDigiCollection"));
   
   
+  for (int i=0; i<61200; i++) {
+    std::string name = "histo_0_rms_EB_" + std::to_string(i);
+    _histo_0_rms_EB[i] = fs->make<TH1F>(name.c_str(), "", 1000, 0, 1000);
+  }
+  for (int i=0; i<14648; i++) {
+    std::string name = "histo_0_rms_EE_" + std::to_string(i);
+    _histo_0_rms_EE[i] = fs->make<TH1F>(name.c_str(), "", 1000, 0, 1000);
+  }
   
+  _outTree = fs->make<TTree>("tree","tree");
   
-  outTree = fs->make<TTree>("tree","tree");
+  _outTree->Branch("LaserCorrection_EB",   _LaserCorrection_EB,    "LaserCorrection_EB[61200]/F");
+  _outTree->Branch("rms_EB",         _rms_EB,    "rms_EB[61200]/F");
+  _outTree->Branch("energy_EB",   _energy_EB,    "energy_EB[61200]/F");
+  _outTree->Branch("ieta",             _ieta,    "ieta[61200]/I");
+  _outTree->Branch("iphi",             _iphi,    "iphi[61200]/I");
   
-  outTree->Branch("LaserCorrection_EB",   _LaserCorrection_EB,    "LaserCorrection_EB[61200]/F");
-  outTree->Branch("rms_EB",         _rms_EB,    "rms_EB[61200]/F");
-  outTree->Branch("energy_EB",   _energy_EB,    "energy_EB[61200]/F");
-  outTree->Branch("ieta",             _ieta,    "ieta[61200]/I");
-  outTree->Branch("iphi",             _iphi,    "iphi[61200]/I");
-  
-  outTree->Branch("LaserCorrection_EE",   _LaserCorrection_EE,    "LaserCorrection_EE[14648]/F");
-  outTree->Branch("rms_EE",         _rms_EE,    "rms_EE[14648]/F");
-  outTree->Branch("energy_EE",   _energy_EE,    "energy_EE[14648]/F");
-  outTree->Branch("ix",                 _ix,    "ix[14648]/I");
-  outTree->Branch("iy",                 _iy,    "iy[14648]/I");
-  outTree->Branch("iz",                 _iz,    "iz[14648]/I");
+  _outTree->Branch("LaserCorrection_EE",   _LaserCorrection_EE,    "LaserCorrection_EE[14648]/F");
+  _outTree->Branch("rms_EE",         _rms_EE,    "rms_EE[14648]/F");
+  _outTree->Branch("energy_EE",   _energy_EE,    "energy_EE[14648]/F");
+  _outTree->Branch("ix",                 _ix,    "ix[14648]/I");
+  _outTree->Branch("iy",                 _iy,    "iy[14648]/I");
+  _outTree->Branch("iz",                 _iz,    "iz[14648]/I");
   
   
 }
@@ -309,8 +320,6 @@ TreeProducerNoise::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     _ieta[EBDetId(itrechit->id()).hashedIndex()] = EBDetId(itrechit->id()).ieta();
     _iphi[EBDetId(itrechit->id()).hashedIndex()] = EBDetId(itrechit->id()).iphi();    
     _LaserCorrection_EB[EBDetId(itrechit->id()).hashedIndex()] = pLaser -> getLaserCorrection( EBDetId(itrechit->id()), iEvent.time() );
-    
-    
   }
   
   
@@ -342,11 +351,12 @@ TreeProducerNoise::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
      sum_square += (value*value) ;
      sum        +=  value ;
    }
-   
 //    std::cout << " hashindex = " << ((EBDetId&)((*itdigi))).hashedIndex() << std::endl;
    _rms_EB[ ((EBDetId&)((*itdigi))).hashedIndex() ] =  sqrt(sum_square/10. - sum/10.*sum/10.);
    
 //    std::cout << " rms eb = " << sqrt(sum_square/10. - sum/10.*sum/10.) << std::endl;   
+
+   _histo_0_rms_EB[ ((EBDetId&)((*itdigi))).hashedIndex() ] -> Fill (  ( int( (*itdigi) [0] ) & 0xFFF ) );    
  }
  
  
@@ -363,6 +373,8 @@ TreeProducerNoise::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
    }
    _rms_EE[ ((EEDetId&)((*itdigi))).hashedIndex() ] =  sqrt(sum_square/10. - sum/10.*sum/10.);
 //    std::cout << " rms ee = " << sqrt(sum_square/10. - sum/10.*sum/10.) << std::endl;   
+
+   _histo_0_rms_EB[ ((EEDetId&)((*itdigi))).hashedIndex() ] -> Fill (  ( int( (*itdigi) [0] ) & 0xFFF ) );    
    
  }
  
@@ -371,7 +383,7 @@ TreeProducerNoise::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
  
  
  
-  outTree->Fill();
+  _outTree->Fill();
   
 }
 

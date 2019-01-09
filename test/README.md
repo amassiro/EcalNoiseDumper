@@ -55,6 +55,9 @@ To get the digi collection, run reco first:
     cmsRun runDumpMC.py  inputFiles=file:production/output.root  outputFile=test.root
 
     
+    ((TH1F*) _file0->Get("TreeProducerNoise/histo_0_rms_EB_100")) ->Draw()
+    --> draw pedestals
+    
     
     
     TTree* tree = (TTree*) _file0->Get("TreeProducerNoise/tree")
