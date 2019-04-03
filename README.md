@@ -8,6 +8,7 @@ What:
 Where:
 
     /afs/cern.ch/user/a/amassiro/work/ECAL/Noise/CMSSW_10_2_0/src/ECALValidation/EcalNoiseDumper
+    /afs/cern.ch/user/a/amassiro/work/ECAL/Noise/CMSSW_10_2_5/src/ECALValidation/EcalNoiseDumper
     
 To install:
 
