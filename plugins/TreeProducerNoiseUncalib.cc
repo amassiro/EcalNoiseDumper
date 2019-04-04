@@ -167,12 +167,16 @@ private:
   
   float _amplitude_EB[61200];
   float _amplitude_second_EB[61200];
+  float _chi2_EB[61200];
+  float _chi2_second_EB[61200];
   float _rms_EB[61200];
   int   _ieta[61200];
   int   _iphi[61200];
 
   float _amplitude_EE[14648];
   float _amplitude_second_EE[14648];
+  float _chi2_EE[14648];
+  float _chi2_second_EE[14648];
   float _rms_EE[14648];
   int   _ix[14648];
   int   _iy[14648];
@@ -231,12 +235,16 @@ TreeProducerNoiseUncalib::TreeProducerNoiseUncalib(const edm::ParameterSet& iCon
   _outTree->Branch("rms_EB",              _rms_EB,              "rms_EB[61200]/F");
   _outTree->Branch("amplitude_EB",        _amplitude_EB,        "amplitude_EB[61200]/F");
   _outTree->Branch("amplitude_second_EB", _amplitude_second_EB, "amplitude_second_EB[61200]/F");
+  _outTree->Branch("chi2_EB",             _chi2_EB,             "chi2_EB[61200]/F");
+  _outTree->Branch("chi2_second_EB",      _chi2_second_EB,      "chi2_second_EB[61200]/F");
   _outTree->Branch("ieta",                _ieta,                "ieta[61200]/I");
   _outTree->Branch("iphi",                _iphi,                "iphi[61200]/I");
   
   _outTree->Branch("rms_EE",              _rms_EE,              "rms_EE[14648]/F");
   _outTree->Branch("amplitude_EE",        _amplitude_EE,        "amplitude_EE[14648]/F");
   _outTree->Branch("amplitude_second_EE", _amplitude_second_EE, "amplitude_second_EE[14648]/F");
+  _outTree->Branch("chi2_EE",             _chi2_EE,             "chi2_EE[14648]/F");
+  _outTree->Branch("chi2_second_EE",      _chi2_second_EE,      "chi2_second_EE[14648]/F");
   _outTree->Branch("ix",                  _ix,                  "ix[14648]/I");
   _outTree->Branch("iy",                  _iy,                  "iy[14648]/I");
   _outTree->Branch("iz",                  _iz,                  "iz[14648]/I");
@@ -306,6 +314,8 @@ TreeProducerNoiseUncalib::analyze(const edm::Event& iEvent, const edm::EventSetu
     _rms_EB[ixtal] = -999;
     _amplitude_EB[ixtal] = -999;
     _amplitude_second_EB[ixtal] = -999;
+    _chi2_EB[ixtal] = -999;
+    _chi2_second_EB[ixtal] = -999;
     _ieta[ixtal] = -999;
     _iphi[ixtal] = -999;
   }
@@ -313,6 +323,8 @@ TreeProducerNoiseUncalib::analyze(const edm::Event& iEvent, const edm::EventSetu
     _rms_EE[ixtal] = -999;
     _amplitude_EE[ixtal] = -999;
     _amplitude_second_EE[ixtal] = -999;
+    _chi2_EE[ixtal] = -999;
+    _chi2_second_EE[ixtal] = -999;
     _ix[ixtal] = -999;
     _iy[ixtal] = -999;
     _iz[ixtal] = -999;
@@ -323,6 +335,7 @@ TreeProducerNoiseUncalib::analyze(const edm::Event& iEvent, const edm::EventSetu
   
   for (EcalUncalibratedRecHitCollection::const_iterator itrechit = ebrechits->begin(); itrechit != ebrechits->end(); itrechit++ ) {
     _amplitude_EB[EBDetId(itrechit->id()).hashedIndex()] =  itrechit->amplitude();  //----> only in EcalUncalibratedRecHit
+    _chi2_EB[EBDetId(itrechit->id()).hashedIndex()] =  itrechit->chi2();  //----> only in EcalUncalibratedRecHit
     _ieta[EBDetId(itrechit->id()).hashedIndex()] = EBDetId(itrechit->id()).ieta();
     _iphi[EBDetId(itrechit->id()).hashedIndex()] = EBDetId(itrechit->id()).iphi();    
   }
@@ -330,6 +343,7 @@ TreeProducerNoiseUncalib::analyze(const edm::Event& iEvent, const edm::EventSetu
   
   for (EcalUncalibratedRecHitCollection::const_iterator itrechit = eerechits->begin(); itrechit != eerechits->end(); itrechit++ ) {
     _amplitude_EE[EEDetId(itrechit->id()).hashedIndex()] =  itrechit->amplitude();  //----> only in EcalUncalibratedRecHit
+    _chi2_EE[EEDetId(itrechit->id()).hashedIndex()] =  itrechit->chi2();  //----> only in EcalUncalibratedRecHit
     _ix[EEDetId(itrechit->id()).hashedIndex()] = EEDetId(itrechit->id()).ix();
     _iy[EEDetId(itrechit->id()).hashedIndex()] = EEDetId(itrechit->id()).iy();
     _iz[EEDetId(itrechit->id()).hashedIndex()] = EEDetId(itrechit->id()).zside();
@@ -339,6 +353,7 @@ TreeProducerNoiseUncalib::analyze(const edm::Event& iEvent, const edm::EventSetu
   
   for (EcalUncalibratedRecHitCollection::const_iterator itrechit = ebrechits_second->begin(); itrechit != ebrechits_second->end(); itrechit++ ) {
     _amplitude_second_EB[EBDetId(itrechit->id()).hashedIndex()] =  itrechit->amplitude();  //----> only in EcalUncalibratedRecHit
+    _chi2_second_EB[EBDetId(itrechit->id()).hashedIndex()] =  itrechit->chi2();  //----> only in EcalUncalibratedRecHit
     _ieta[EBDetId(itrechit->id()).hashedIndex()] = EBDetId(itrechit->id()).ieta();
     _iphi[EBDetId(itrechit->id()).hashedIndex()] = EBDetId(itrechit->id()).iphi();    
   }
@@ -346,6 +361,7 @@ TreeProducerNoiseUncalib::analyze(const edm::Event& iEvent, const edm::EventSetu
   
   for (EcalUncalibratedRecHitCollection::const_iterator itrechit = eerechits_second->begin(); itrechit != eerechits_second->end(); itrechit++ ) {
     _amplitude_second_EE[EEDetId(itrechit->id()).hashedIndex()] =  itrechit->amplitude();  //----> only in EcalUncalibratedRecHit
+    _chi2_second_EE[EEDetId(itrechit->id()).hashedIndex()] =  itrechit->chi2();  //----> only in EcalUncalibratedRecHit
     _ix[EEDetId(itrechit->id()).hashedIndex()] = EEDetId(itrechit->id()).ix();
     _iy[EEDetId(itrechit->id()).hashedIndex()] = EEDetId(itrechit->id()).iy();
     _iz[EEDetId(itrechit->id()).hashedIndex()] = EEDetId(itrechit->id()).zside();

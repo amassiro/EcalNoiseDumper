@@ -16,7 +16,7 @@ Input
     
 Then run the dumper of uncalibrated rechit:
 
-    cmsRun dumpUncalibRechit.py  inputFiles=file:reco.root       outputFile=tree.root
+    cmsRun dumpUncalibRechit.py  inputFiles=file:reco.root       outputFile=tree_localRun.root
 
 And now draw:
 
@@ -49,3 +49,10 @@ And now draw:
     tree ->Draw("amplitude_EB:amplitude_second_EB", "(amplitude_second_EB>=-10) && (amplitude_second_EB<400)", "colz");
     tree ->Draw("amplitude_EE:amplitude_second_EE", "(amplitude_second_EE>=-10) && (amplitude_second_EE<400)", "colz");
 
+
+    
+Now chi2 comparison:
+
+    pedestal run vs Zee RawReco
+    
+    
