@@ -185,6 +185,8 @@ private:
   int   _ix[14648];
   int   _iy[14648];
   int   _iz[14648];
+  int   _size_EB;
+  int   _size_EE;
   
   
   //---- rms for EE and EB
@@ -256,6 +258,10 @@ TreeProducerNoiseUncalib::TreeProducerNoiseUncalib(const edm::ParameterSet& iCon
   _outTree->Branch("ix",                  _ix,                  "ix[14648]/I");
   _outTree->Branch("iy",                  _iy,                  "iy[14648]/I");
   _outTree->Branch("iz",                  _iz,                  "iz[14648]/I");
+
+  _outTree->Branch("size_EB",             &_size_EB,                  "size_EB/I");
+  _outTree->Branch("size_EE",             &_size_EE,                  "size_EE/I");
+  
   
   
 }
@@ -342,9 +348,15 @@ TreeProducerNoiseUncalib::analyze(const edm::Event& iEvent, const edm::EventSetu
     _iz[ixtal] = -999;
   }
   
+  _size_EB = -999;
+  _size_EE = -999;
+  
+  
   
   //---- geometry 
   
+  _size_EB = ebrechits->size();
+//   std::cout << " ebrechits->size() = " << ebrechits->size() << std::endl;
   for (EcalUncalibratedRecHitCollection::const_iterator itrechit = ebrechits->begin(); itrechit != ebrechits->end(); itrechit++ ) {
     _amplitude_EB[EBDetId(itrechit->id()).hashedIndex()] =  itrechit->amplitude();  //----> only in EcalUncalibratedRecHit
     _chi2_EB[EBDetId(itrechit->id()).hashedIndex()] =  itrechit->chi2();  //----> only in EcalUncalibratedRecHit
@@ -353,7 +365,8 @@ TreeProducerNoiseUncalib::analyze(const edm::Event& iEvent, const edm::EventSetu
     _iphi[EBDetId(itrechit->id()).hashedIndex()] = EBDetId(itrechit->id()).iphi();    
   }
   
-  
+  _size_EE = eerechits->size();
+//   std::cout << " eerechits->size() = " << eerechits->size() << std::endl;
   for (EcalUncalibratedRecHitCollection::const_iterator itrechit = eerechits->begin(); itrechit != eerechits->end(); itrechit++ ) {
     _amplitude_EE[EEDetId(itrechit->id()).hashedIndex()] =  itrechit->amplitude();  //----> only in EcalUncalibratedRecHit
     _chi2_EE[EEDetId(itrechit->id()).hashedIndex()] =  itrechit->chi2();  //----> only in EcalUncalibratedRecHit
