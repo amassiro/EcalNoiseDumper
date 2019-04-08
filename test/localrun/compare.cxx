@@ -31,11 +31,13 @@ void compare (std::string name, int numbin, float min, float max, std::string cu
   plot = Form ("%s >> histo_1", name.c_str());
   tree_1->Draw(plot.Data(), cut_1.c_str(), "goff");
   
+  histo_1->SetFillStyle(3004);
+  histo_1->SetFillColor(kRed);
   histo_1->SetLineColor(kRed);
   histo_1->SetLineWidth(2);
   integral = histo_1->Integral();  histo_1->Scale (1. / integral );
   
-  histo_1->Draw("same");
+  histo_1->Draw("histo same");
   
   
   TLegend* leg = new TLegend ( 0.70, 0.70, 0.90, 0.90 );

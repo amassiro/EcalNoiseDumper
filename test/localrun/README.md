@@ -90,6 +90,26 @@ Now chi2 comparison:
     
     
     
+    r99t tree_localRun.root    tree_ZeeRawReco.root    compare.cxx\(\"amplitude_EB/rms_EB\",100,0,10,\"amplitude_EB\>-1\"\)
+    r99t tree_localRun.root    tree_ZeeRawReco.root    compare.cxx\(\"amplitude_second_EB/rms_EB\",100,0,10,\"amplitude_EB\>-1\"\)
+    
+    
+    r99t tree_localRun.root    draw.cxx\(\"amplitude_EB/rms_EB\",100,0,10,\"amplitude_EB\>-1\"\)
+    r99t tree_localRun.root    draw.cxx\(\"amplitude_second_EB/rms_EB\",100,0,10,\"amplitude_EB\>-1\"\)
+    r99t tree_localRun.root    draw.cxx\(\"amplitude_second_EB/rms_EB\",200,-10,10,\"amplitude_EB\>-1\"\)
+    r99t tree_localRun.root    draw.cxx\(\"amplitude_second_EE/rms_EE\",200,-10,10,\"amplitude_EE\>-1\"\)
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     
