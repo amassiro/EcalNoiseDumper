@@ -107,9 +107,13 @@ Now chi2 comparison:
     r99t tree_localRun.root    draw.cxx\(\"size_EE\",1000,0,100000\)
     
     
+
+    r99t tree_localRun.root    draw.cxx\(\"amplitude_EB\",100,0,10,\"amplitude_EB\>-10\"\)
+    r99t tree_localRun.root    draw.cxx\(\"amplitude_second_EB\",200,0-10,10,\"amplitude_second_EB\>-10\"\)
+
     
     
-    
+    r99t tree_localRun.root    draw.cxx\(\"chi2_EB/amplitude_EB\",100,0,10,\"amplitude_EB\>-10\"\)
     
     
     
