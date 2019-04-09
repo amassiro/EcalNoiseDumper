@@ -118,6 +118,10 @@ Now chi2 comparison:
     
     
     
+    TTree* tree_0 = (TTree*) _file0->Get("TreeProducerNoiseUncalib/tree");
+    tree_0->Draw("chi2_EB:amplitudeError_EB", "amplitude_EB<100 && amplitude_EB>-1 && chi2_EB<10 && amplitudeError_EB<5", "colz")
+
+    
     
     
     
