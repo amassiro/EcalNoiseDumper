@@ -215,11 +215,6 @@ TreeProducerNoise::TreeProducerNoise(const edm::ParameterSet& iConfig)
   _token_ebdigi = consumes<EBDigiCollection>(iConfig.getParameter<edm::InputTag>("EBDigiCollection"));
   _token_eedigi = consumes<EEDigiCollection>(iConfig.getParameter<edm::InputTag>("EEDigiCollection"));
   
-  _outTree->Branch("runNumber",   _runNumber,    "runNumber/I");
-  _outTree->Branch("LS",                 _LS,    "LS/I");
-  _outTree->Branch("time",             _time,    "time/I");
-  
-  
   for (int i=0; i<61200; i++) {
     std::string name = "histo_0_rms_EB_" + std::to_string(i);
     _histo_0_rms_EB[i] = fs->make<TH1F>(name.c_str(), "", 1000, 0, 1000);
@@ -231,6 +226,10 @@ TreeProducerNoise::TreeProducerNoise(const edm::ParameterSet& iConfig)
   
   _outTree = fs->make<TTree>("tree","tree");
   
+  _outTree->Branch("runNumber",   &_runNumber,    "runNumber/I");
+  _outTree->Branch("LS",                 &_LS,    "LS/I");
+  _outTree->Branch("time",             &_time,    "time/I");
+
   _outTree->Branch("LaserCorrection_EB",   _LaserCorrection_EB,    "LaserCorrection_EB[61200]/F");
   _outTree->Branch("rms_EB",         _rms_EB,    "rms_EB[61200]/F");
   _outTree->Branch("energy_EB",   _energy_EB,    "energy_EB[61200]/F");
