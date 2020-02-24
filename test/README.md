@@ -45,6 +45,8 @@ Run
 
 
     
+    
+    
 To get the digi collection, run reco first:
  
     cmsRun reco.py  inputFiles=file:/eos/cms/store/group/dpg_ecal/comm_ecal/cmkuo/NuGun/step3_RAW2DIGI_L1Reco_RECO_RECOSIM_EI_PAT_VALIDATION_DQM_PhoStat_2.root   outputFile=/tmp/amassiro/myreco.root
@@ -80,6 +82,16 @@ To get the digi collection, run reco first:
     TTree* tree = (TTree*) _file0->Get("TreeProducerNoise/tree")
     tree ->Draw("energy_EB/LaserCorrection_EB/rms_EB/0.03894>>h(200,0,5", "(energy_EB>=0)", "");
     tree ->Draw("energy_EE/LaserCorrection_EE/rms_EE/0.068182>>h(200,0,5", "(energy_EE>=0)", "");
+    
+    
+Time dependent MC
+====
+
+
+    /RelValZEE_13UP18_RD/CMSSW_11_1_0_pre2-PUpmx25ns_111X_upgrade2018_realistic_RunDep_v1_1kPerLS-v1/GEN-SIM-RECO 
+    --> samples_timedep.py
+    
+    cmsRun runDumpMCtimeDep.py   outputFile=test.root   maxEvents=10
     
     
     

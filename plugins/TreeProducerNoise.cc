@@ -159,6 +159,11 @@ private:
   
   TTree *_outTree;
   
+  int   _runNumber;
+  int   _LS;
+  int   _time;
+  
+  
   float _LaserCorrection_EB[61200];
   float _energy_EB[61200];
   float _rms_EB[61200];
@@ -210,6 +215,10 @@ TreeProducerNoise::TreeProducerNoise(const edm::ParameterSet& iConfig)
   _token_ebdigi = consumes<EBDigiCollection>(iConfig.getParameter<edm::InputTag>("EBDigiCollection"));
   _token_eedigi = consumes<EEDigiCollection>(iConfig.getParameter<edm::InputTag>("EEDigiCollection"));
   
+  _outTree->Branch("runNumber",   _runNumber,    "runNumber/I");
+  _outTree->Branch("LS",                 _LS,    "LS/I");
+  _outTree->Branch("time",             _time,    "time/I");
+  
   
   for (int i=0; i<61200; i++) {
     std::string name = "histo_0_rms_EB_" + std::to_string(i);
@@ -255,6 +264,13 @@ TreeProducerNoise::~TreeProducerNoise()
 // ------------ method called for each event  ------------
 void
 TreeProducerNoise::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
+  
+  _LS = iEvent.luminosityBlock();
+  _runNumber = iEvent.id ().run ();
+  _time = (int)(iEvent.time().value() >> 32);
+  
+  //   BX_ = iEvent.bunchCrossing();
+  //   eventId_ = iEvent.id ().event ();
   
   
   //---- rechits
