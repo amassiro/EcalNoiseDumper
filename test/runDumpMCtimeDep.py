@@ -51,6 +51,17 @@ process.GlobalTag = GlobalTag(process.GlobalTag, '102X_upgrade2018_realistic_v12
 
 process.TreeProducerNoise = cms.EDAnalyzer('TreeProducerNoise',
 
+                            #
+                            # 
+                            #
+                            
+                            runEvery = cms.untracked.int32 (1000),
+                            
+                            #
+                            #
+                            #
+
+
                             EcalRecHitsEBCollection = cms.InputTag("ecalRecHit",  "EcalRecHitsEB"),
                             EcalRecHitsEECollection = cms.InputTag("ecalRecHit",  "EcalRecHitsEE"),
 

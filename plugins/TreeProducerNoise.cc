@@ -156,13 +156,15 @@ private:
   edm::EDGetTokenT<EEDigiCollection> _token_eedigi;
   
   
+  int _runEvery;
+  
   
   TTree *_outTree;
   
   int   _runNumber;
   int   _LS;
   int   _time;
-  
+  int   _eventId;
   
   float _LaserCorrection_EB[61200];
   float _energy_EB[61200];
@@ -204,6 +206,9 @@ TreeProducerNoise::TreeProducerNoise(const edm::ParameterSet& iConfig)
   //now do what ever initialization is needed
   usesResource("TFileService");
   
+  _runEvery  = iConfig.getUntrackedParameter<int32_t>("runEvery",-1);
+  
+  std::cout << " runEvery = " << _runEvery << std::endl;
   
   //now do what ever initialization is needed
   usesResource("TFileService");
@@ -229,7 +234,9 @@ TreeProducerNoise::TreeProducerNoise(const edm::ParameterSet& iConfig)
   _outTree->Branch("runNumber",   &_runNumber,    "runNumber/I");
   _outTree->Branch("LS",                 &_LS,    "LS/I");
   _outTree->Branch("time",             &_time,    "time/I");
-
+  _outTree->Branch("eventId",       &_eventId,    "eventId/I");
+  
+  
   _outTree->Branch("LaserCorrection_EB",   _LaserCorrection_EB,    "LaserCorrection_EB[61200]/F");
   _outTree->Branch("rms_EB",         _rms_EB,    "rms_EB[61200]/F");
   _outTree->Branch("energy_EB",   _energy_EB,    "energy_EB[61200]/F");
@@ -267,138 +274,143 @@ TreeProducerNoise::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   _LS = iEvent.luminosityBlock();
   _runNumber = iEvent.id ().run ();
   _time = (int)(iEvent.time().value() >> 32);
+  _eventId = iEvent.id ().event ();
   
   //   BX_ = iEvent.bunchCrossing();
-  //   eventId_ = iEvent.id ().event ();
   
   
-  //---- rechits
+  if (_runEvery != -1 || !(_eventId%_runEvery)) {
   
-  edm::Handle<EcalRecHitCollection> ebrechithandle;
-  const EcalRecHitCollection *ebrechits = NULL;
-  edm::Handle<EcalRecHitCollection> eerechithandle;
-  const EcalRecHitCollection *eerechits = NULL;
-  
-  iEvent.getByToken(_token_ebrechits,ebrechithandle);
-  ebrechits = ebrechithandle.product();
-  iEvent.getByToken(_token_eerechits,eerechithandle);
-  eerechits = eerechithandle.product();
- 
-  
-  //---- digis
-  edm::Handle<EBDigiCollection> ebdigihandle;
-  const EBDigiCollection *ebdigis = NULL;
-  edm::Handle<EEDigiCollection> eedigihandle;
-  const EEDigiCollection *eedigis = NULL;
-  
-  iEvent.getByToken(_token_ebdigi,ebdigihandle);
-  ebdigis = ebdigihandle.product();
-  iEvent.getByToken(_token_eedigi,eedigihandle);
-  eedigis = eedigihandle.product();
-  
-  
-  
-  //---- setup default
-  for (int ixtal=0; ixtal < 61200; ixtal++) {
-    _LaserCorrection_EB[ixtal] = -999;
-    _rms_EB[ixtal] = -999;
-    _energy_EB[ixtal] = -999;
-    _ieta[ixtal] = -999;
-    _iphi[ixtal] = -999;
+    
+    //---- rechits
+    
+    edm::Handle<EcalRecHitCollection> ebrechithandle;
+    const EcalRecHitCollection *ebrechits = NULL;
+    edm::Handle<EcalRecHitCollection> eerechithandle;
+    const EcalRecHitCollection *eerechits = NULL;
+    
+    iEvent.getByToken(_token_ebrechits,ebrechithandle);
+    ebrechits = ebrechithandle.product();
+    iEvent.getByToken(_token_eerechits,eerechithandle);
+    eerechits = eerechithandle.product();
+    
+    
+    //---- digis
+    edm::Handle<EBDigiCollection> ebdigihandle;
+    const EBDigiCollection *ebdigis = NULL;
+    edm::Handle<EEDigiCollection> eedigihandle;
+    const EEDigiCollection *eedigis = NULL;
+    
+    iEvent.getByToken(_token_ebdigi,ebdigihandle);
+    ebdigis = ebdigihandle.product();
+    iEvent.getByToken(_token_eedigi,eedigihandle);
+    eedigis = eedigihandle.product();
+    
+    
+    
+    //---- setup default
+    for (int ixtal=0; ixtal < 61200; ixtal++) {
+      _LaserCorrection_EB[ixtal] = -999;
+      _rms_EB[ixtal] = -999;
+      _energy_EB[ixtal] = -999;
+      _ieta[ixtal] = -999;
+      _iphi[ixtal] = -999;
+    }
+    for (int ixtal=0; ixtal < 14648; ixtal++) {
+      _LaserCorrection_EE[ixtal] = -999;
+      _rms_EE[ixtal] = -999;
+      _energy_EE[ixtal] = -999;
+      _ix[ixtal] = -999;
+      _iy[ixtal] = -999;
+      _iz[ixtal] = -999;
+    }
+    
+    
+    //---- geometry 
+    
+    //   edm::ESHandle<CaloGeometry> pGeometry;
+    //   iSetup.get<CaloGeometryRecord>().get(pGeometry);
+    //   const CaloGeometry *geometry = pGeometry.product();
+    
+    
+    // Laser corrections
+    edm::ESHandle<EcalLaserDbService> pLaser;
+    iSetup.get<EcalLaserDbRecord>().get( pLaser );
+    
+    
+    
+    for (EcalRecHitCollection::const_iterator itrechit = ebrechits->begin(); itrechit != ebrechits->end(); itrechit++ ) {
+      //     _energy_EB[EBDetId(itrechit->id()).hashedIndex()] =  itrechit->amplitude();  //----> only in EcalUncalibratedRecHit
+      _energy_EB[EBDetId(itrechit->id()).hashedIndex()] =  itrechit->energy();
+      _ieta[EBDetId(itrechit->id()).hashedIndex()] = EBDetId(itrechit->id()).ieta();
+      _iphi[EBDetId(itrechit->id()).hashedIndex()] = EBDetId(itrechit->id()).iphi();    
+      _LaserCorrection_EB[EBDetId(itrechit->id()).hashedIndex()] = pLaser -> getLaserCorrection( EBDetId(itrechit->id()), iEvent.time() );
+    }
+    
+    
+    for (EcalRecHitCollection::const_iterator itrechit = eerechits->begin(); itrechit != eerechits->end(); itrechit++ ) {
+      //     _energy_EE[EEDetId(itrechit->id()).hashedIndex()] =  itrechit->amplitude();  //----> only in EcalUncalibratedRecHit
+      _energy_EE[EEDetId(itrechit->id()).hashedIndex()] =  itrechit->energy();
+      _ix[EEDetId(itrechit->id()).hashedIndex()] = EEDetId(itrechit->id()).ix();
+      _iy[EEDetId(itrechit->id()).hashedIndex()] = EEDetId(itrechit->id()).iy();
+      _iz[EEDetId(itrechit->id()).hashedIndex()] = EEDetId(itrechit->id()).zside();
+      _LaserCorrection_EE[EEDetId(itrechit->id()).hashedIndex()] = pLaser -> getLaserCorrection( EEDetId(itrechit->id()), iEvent.time() );
+    }
+    
+    
+    
+    
+    //---- get RMS noise
+    
+    for (EBDigiCollection::const_iterator itdigi = ebdigis->begin(); itdigi != ebdigis->end(); itdigi++ ) {
+      
+      float sum_square = 0;
+      float sum        = 0;
+      
+      //    std::cout << " itdigi->size() = " << itdigi->size() << std::endl; // --> it is 10
+      
+      //                                                           0xFFF = 4095
+      for (int iSample = 0; iSample < 10; iSample++) {
+        float value = ( int( (*itdigi) [iSample] ) & 0xFFF );
+        //      float value = ( ( (*itdigi) [iSample] ).adc() );
+        sum_square += (value*value) ;
+        sum        +=  value ;
+      }
+      //    std::cout << " hashindex = " << ((EBDetId&)((*itdigi))).hashedIndex() << std::endl;
+      _rms_EB[ ((EBDetId&)((*itdigi))).hashedIndex() ] =  sqrt(sum_square/10. - sum/10.*sum/10.);
+      
+      //    std::cout << " rms eb = " << sqrt(sum_square/10. - sum/10.*sum/10.) << std::endl;   
+      
+      _histo_0_rms_EB[ ((EBDetId&)((*itdigi))).hashedIndex() ] -> Fill (  ( int( (*itdigi) [0] ) & 0xFFF ) );    
+    }
+    
+    
+    for (EEDigiCollection::const_iterator itdigi = eedigis->begin(); itdigi != eedigis->end(); itdigi++ ) {
+      
+      float sum_square = 0;
+      float sum        = 0;
+      
+      //                                                           0xFFF = 4095
+      for (int iSample = 0; iSample < 10; iSample++) {
+        float value = ( int( (*itdigi) [iSample] ) & 0xFFF );
+        sum_square += (value*value) ;
+        sum        +=  value ;
+      }
+      _rms_EE[ ((EEDetId&)((*itdigi))).hashedIndex() ] =  sqrt(sum_square/10. - sum/10.*sum/10.);
+      //    std::cout << " rms ee = " << sqrt(sum_square/10. - sum/10.*sum/10.) << std::endl;   
+      
+      _histo_0_rms_EE[ ((EEDetId&)((*itdigi))).hashedIndex() ] -> Fill (  ( int( (*itdigi) [0] ) & 0xFFF ) );    
+      
+    }
+    
+    
+    
+    
+    
+    
+    _outTree->Fill();
+    
   }
-  for (int ixtal=0; ixtal < 14648; ixtal++) {
-    _LaserCorrection_EE[ixtal] = -999;
-    _rms_EE[ixtal] = -999;
-    _energy_EE[ixtal] = -999;
-    _ix[ixtal] = -999;
-    _iy[ixtal] = -999;
-    _iz[ixtal] = -999;
-  }
-  
-  
-  //---- geometry 
-  
-//   edm::ESHandle<CaloGeometry> pGeometry;
-//   iSetup.get<CaloGeometryRecord>().get(pGeometry);
-//   const CaloGeometry *geometry = pGeometry.product();
-  
-  
-  // Laser corrections
-  edm::ESHandle<EcalLaserDbService> pLaser;
-  iSetup.get<EcalLaserDbRecord>().get( pLaser );
-  
-  
-  
-  for (EcalRecHitCollection::const_iterator itrechit = ebrechits->begin(); itrechit != ebrechits->end(); itrechit++ ) {
-//     _energy_EB[EBDetId(itrechit->id()).hashedIndex()] =  itrechit->amplitude();  //----> only in EcalUncalibratedRecHit
-    _energy_EB[EBDetId(itrechit->id()).hashedIndex()] =  itrechit->energy();
-    _ieta[EBDetId(itrechit->id()).hashedIndex()] = EBDetId(itrechit->id()).ieta();
-    _iphi[EBDetId(itrechit->id()).hashedIndex()] = EBDetId(itrechit->id()).iphi();    
-    _LaserCorrection_EB[EBDetId(itrechit->id()).hashedIndex()] = pLaser -> getLaserCorrection( EBDetId(itrechit->id()), iEvent.time() );
-  }
-  
-  
-  for (EcalRecHitCollection::const_iterator itrechit = eerechits->begin(); itrechit != eerechits->end(); itrechit++ ) {
-//     _energy_EE[EEDetId(itrechit->id()).hashedIndex()] =  itrechit->amplitude();  //----> only in EcalUncalibratedRecHit
-    _energy_EE[EEDetId(itrechit->id()).hashedIndex()] =  itrechit->energy();
-    _ix[EEDetId(itrechit->id()).hashedIndex()] = EEDetId(itrechit->id()).ix();
-    _iy[EEDetId(itrechit->id()).hashedIndex()] = EEDetId(itrechit->id()).iy();
-    _iz[EEDetId(itrechit->id()).hashedIndex()] = EEDetId(itrechit->id()).zside();
-    _LaserCorrection_EE[EEDetId(itrechit->id()).hashedIndex()] = pLaser -> getLaserCorrection( EEDetId(itrechit->id()), iEvent.time() );
-  }
- 
- 
- 
- 
- //---- get RMS noise
- 
- for (EBDigiCollection::const_iterator itdigi = ebdigis->begin(); itdigi != ebdigis->end(); itdigi++ ) {
-   
-   float sum_square = 0;
-   float sum        = 0;
-   
-//    std::cout << " itdigi->size() = " << itdigi->size() << std::endl; // --> it is 10
-   
-   //                                                           0xFFF = 4095
-   for (int iSample = 0; iSample < 10; iSample++) {
-     float value = ( int( (*itdigi) [iSample] ) & 0xFFF );
-//      float value = ( ( (*itdigi) [iSample] ).adc() );
-     sum_square += (value*value) ;
-     sum        +=  value ;
-   }
-//    std::cout << " hashindex = " << ((EBDetId&)((*itdigi))).hashedIndex() << std::endl;
-   _rms_EB[ ((EBDetId&)((*itdigi))).hashedIndex() ] =  sqrt(sum_square/10. - sum/10.*sum/10.);
-   
-//    std::cout << " rms eb = " << sqrt(sum_square/10. - sum/10.*sum/10.) << std::endl;   
-
-   _histo_0_rms_EB[ ((EBDetId&)((*itdigi))).hashedIndex() ] -> Fill (  ( int( (*itdigi) [0] ) & 0xFFF ) );    
- }
- 
- 
- for (EEDigiCollection::const_iterator itdigi = eedigis->begin(); itdigi != eedigis->end(); itdigi++ ) {
-
-   float sum_square = 0;
-   float sum        = 0;
-   
-   //                                                           0xFFF = 4095
-   for (int iSample = 0; iSample < 10; iSample++) {
-     float value = ( int( (*itdigi) [iSample] ) & 0xFFF );
-     sum_square += (value*value) ;
-     sum        +=  value ;
-   }
-   _rms_EE[ ((EEDetId&)((*itdigi))).hashedIndex() ] =  sqrt(sum_square/10. - sum/10.*sum/10.);
-//    std::cout << " rms ee = " << sqrt(sum_square/10. - sum/10.*sum/10.) << std::endl;   
-
-   _histo_0_rms_EE[ ((EEDetId&)((*itdigi))).hashedIndex() ] -> Fill (  ( int( (*itdigi) [0] ) & 0xFFF ) );    
-   
- }
- 
- 
- 
- 
- 
- 
-  _outTree->Fill();
   
 }
 

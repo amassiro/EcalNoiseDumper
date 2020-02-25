@@ -92,6 +92,17 @@ Time dependent MC
     --> samples_timedep.py
     
     cmsRun runDumpMCtimeDep.py   outputFile=test.root   maxEvents=10
+    cmsRun runDumpMCtimeDep.py   outputFile=/tmp/amassiro/testBig.root
+    
+    
+    
+    TTree* tree = (TTree*) _file0->Get("TreeProducerNoise/tree")
+    tree ->Draw("LaserCorrection_EB:time", "(energy_EB>=0)", "");
+    
+    tree ->Draw("time", "", "");
+    tree ->Draw("runNumber", "", "");
+    tree ->Draw("LS", "", "");
+    
     
     
     
