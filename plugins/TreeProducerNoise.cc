@@ -279,7 +279,7 @@ TreeProducerNoise::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   //   BX_ = iEvent.bunchCrossing();
   
   
-  if (_runEvery != -1 || !(_eventId%_runEvery)) {
+  if (_runEvery == -1 || !(_eventId%_runEvery)) {
   
     
     //---- rechits
