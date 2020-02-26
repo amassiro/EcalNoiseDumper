@@ -165,6 +165,7 @@ private:
   int   _LS;
   int   _time;
   int   _eventId;
+  int   _BX;
   
   float _LaserCorrection_EB[61200];
   float _energy_EB[61200];
@@ -235,8 +236,8 @@ TreeProducerNoise::TreeProducerNoise(const edm::ParameterSet& iConfig)
   _outTree->Branch("LS",                 &_LS,    "LS/I");
   _outTree->Branch("time",             &_time,    "time/I");
   _outTree->Branch("eventId",       &_eventId,    "eventId/I");
-  
-  
+  _outTree->Branch("BX",                 &_BX,    "BX/I");
+    
   _outTree->Branch("LaserCorrection_EB",   _LaserCorrection_EB,    "LaserCorrection_EB[61200]/F");
   _outTree->Branch("rms_EB",         _rms_EB,    "rms_EB[61200]/F");
   _outTree->Branch("energy_EB",   _energy_EB,    "energy_EB[61200]/F");
@@ -275,8 +276,7 @@ TreeProducerNoise::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   _runNumber = iEvent.id ().run ();
   _time = (int)(iEvent.time().value() >> 32);
   _eventId = iEvent.id ().event ();
-  
-  //   BX_ = iEvent.bunchCrossing();
+  _BX = iEvent.bunchCrossing();
   
   
   if (_runEvery == -1 || !(_eventId%_runEvery)) {
