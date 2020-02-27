@@ -66,4 +66,26 @@ Apply full readout:
 Reco, Step 3 with keep *
 
     cmsRun ../reco.py  inputFiles=file:step2.root
+
+
+
     
+    
+Time dependent MC tests
+====
+
+    cmsRun task1_runDep.py
+    cmsRun task2_runDep.py
+    cmsRun task3_runDep.py
+
+
+It works:
+
+    Begin processing the 488th record. Run 315257, Event 987, LumiSection 20 on stream 0 at 27-Feb-2020 12:26:16.469 CET
+    Begin processing the 489th record. Run 316082, Event 1011, LumiSection 21 on stream 4 at 27-Feb-2020 12:26:50.968 CET
+
+
+
+
+
+
