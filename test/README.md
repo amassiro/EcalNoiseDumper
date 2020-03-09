@@ -98,6 +98,17 @@ Time dependent MC
     
     TTree* tree = (TTree*) _file0->Get("TreeProducerNoise/tree")
     tree ->Draw("LaserCorrection_EB:time", "(energy_EB>=0)", "");
+    tree ->Draw("LaserCorrection_EB:runNumber", "(energy_EB>=0)", "");
+    tree ->Draw("LaserCorrection_EB:runNumber", "(energy_EB>=0)", "colz");
+    
+    tree ->Draw("LaserCorrection_EE:runNumber", "(energy_EE>=0)", "colz");
+    
+    tree ->Draw("LaserCorrection_EE:runNumber", "(energy_EE>=0) && ix==40 && iy==60 && iz==1", "colz");
+    tree ->Draw("LaserCorrection_EE:runNumber", "(energy_EE>=0) && ix==50 && iy==30 && iz==1", "colz");
+    
+    tree ->Draw("ix:iy", "(energy_EB>=0)", "colz");
+    tree ->Draw("ix:iy", "(energy_EB>=0) && ix>0", "colz");
+    
     
     tree ->Draw("time", "", "");
     tree ->Draw("runNumber", "", "");
@@ -107,6 +118,14 @@ Time dependent MC
     
     
     
+    -> new one, correct 
+    /RelValZEE_13UP18_RD/CMSSW_11_1_0_pre4-PUpmx25ns_111X_upgrade2018_realistic_RunDep_v1-v1/MINIAODSIM
+    /RelValZEE_13UP18_RD/CMSSW_11_1_0_pre4-PUpmx25ns_111X_upgrade2018_realistic_RunDep_v1-v1/GEN-SIM-RECO
+    
+    
+    
+    
+
     
     
     
