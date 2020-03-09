@@ -46,7 +46,11 @@ from Configuration.AlCa.GlobalTag import GlobalTag
 
 
 # 2018 MC
-process.GlobalTag = GlobalTag(process.GlobalTag, '102X_upgrade2018_realistic_v12', '')
+#process.GlobalTag = GlobalTag(process.GlobalTag, '102X_upgrade2018_realistic_v12', '')
+
+# 2018 MC ... time dependent
+process.GlobalTag = GlobalTag(process.GlobalTag, '111X_upgrade2018_realistic_RunDep_v1', '')
+
 
 
 process.TreeProducerNoise = cms.EDAnalyzer('TreeProducerNoise',
@@ -55,7 +59,7 @@ process.TreeProducerNoise = cms.EDAnalyzer('TreeProducerNoise',
                             # 
                             #
                             
-                            runEvery = cms.untracked.int32 (1000),
+                            runEvery = cms.untracked.int32 (100),
                             
                             #
                             #

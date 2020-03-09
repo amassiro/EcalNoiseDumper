@@ -106,8 +106,8 @@ Time dependent MC
     tree ->Draw("LaserCorrection_EE:runNumber", "(energy_EE>=0) && ix==40 && iy==60 && iz==1", "colz");
     tree ->Draw("LaserCorrection_EE:runNumber", "(energy_EE>=0) && ix==50 && iy==30 && iz==1", "colz");
     
-    tree ->Draw("ix:iy", "(energy_EB>=0)", "colz");
-    tree ->Draw("ix:iy", "(energy_EB>=0) && ix>0", "colz");
+    tree ->Draw("ix:iy", "(energy_EE>=0)", "colz");
+    tree ->Draw("ix:iy", "(energy_EE>=0) && ix>0 && iz==1", "colz");
     
     
     tree ->Draw("time", "", "");
