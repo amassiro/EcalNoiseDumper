@@ -126,6 +126,32 @@ Time dependent MC
     
     
 
+    TTree* tree = (TTree*) _file0->Get("TreeProducerNoise/tree")
+    tree ->Draw("rms_EB:runNumber", "(energy_EB>=0) && rms_EB>=0", "colz");
+    tree ->Draw("rms_EB:runNumber", "(energy_EB>=0) && rms_EB>=0 && abs(ieta)<=20", "colz");
+    
+    Run range: 315000 - 325000
+    TTree* tree = (TTree*) _file0->Get("TreeProducerNoise/tree")
+    tree ->Draw("rms_EB:runNumber >> histo(30, 315000, 325000, 200, 0, 50 )", "(energy_EB>=0) && (energy_EB<5) && rms_EB>=0");
+    histo->Draw("colz")
+    histo->GetXaxis()->SetTitle("Run number")
+    histo->GetYaxis()->SetTitle("RMS adc")
+    histo->Draw("colz")
+    TH1D *projh2X = histo->ProfileX()
+    
+    TCanvas* ccnew = new TCanvas ("ccnew", "", 800, 600)
+    projh2X->Draw()
+    
+    
+
+    r99t /tmp/amassiro/testBig.root drawNoiseRunDep.cxx
+    
+    
+
+    
+    
+    
+    
     
     
     

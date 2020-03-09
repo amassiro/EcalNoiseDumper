@@ -59,7 +59,7 @@ process.TreeProducerNoise = cms.EDAnalyzer('TreeProducerNoise',
                             # 
                             #
                             
-                            runEvery = cms.untracked.int32 (100),
+                            runEvery = cms.untracked.int32 (10),
                             
                             #
                             #

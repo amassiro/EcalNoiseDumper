@@ -361,26 +361,22 @@ TreeProducerNoise::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     
     
     //---- get RMS noise
+
+    int N_for_rms = 3; // 10
     
     for (EBDigiCollection::const_iterator itdigi = ebdigis->begin(); itdigi != ebdigis->end(); itdigi++ ) {
       
       float sum_square = 0;
       float sum        = 0;
       
-      //    std::cout << " itdigi->size() = " << itdigi->size() << std::endl; // --> it is 10
-      
       //                                                           0xFFF = 4095
-      for (int iSample = 0; iSample < 10; iSample++) {
+      for (int iSample = 0; iSample < N_for_rms; iSample++) {
         float value = ( int( (*itdigi) [iSample] ) & 0xFFF );
         //      float value = ( ( (*itdigi) [iSample] ).adc() );
         sum_square += (value*value) ;
         sum        +=  value ;
       }
-      //    std::cout << " hashindex = " << ((EBDetId&)((*itdigi))).hashedIndex() << std::endl;
-      _rms_EB[ ((EBDetId&)((*itdigi))).hashedIndex() ] =  sqrt(sum_square/10. - sum/10.*sum/10.);
-      
-      //    std::cout << " rms eb = " << sqrt(sum_square/10. - sum/10.*sum/10.) << std::endl;   
-      
+      _rms_EB[ ((EBDetId&)((*itdigi))).hashedIndex() ] =  sqrt(sum_square/N_for_rms - sum/N_for_rms*sum/N_for_rms);
       _histo_0_rms_EB[ ((EBDetId&)((*itdigi))).hashedIndex() ] -> Fill (  ( int( (*itdigi) [0] ) & 0xFFF ) );    
     }
     
@@ -391,14 +387,12 @@ TreeProducerNoise::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       float sum        = 0;
       
       //                                                           0xFFF = 4095
-      for (int iSample = 0; iSample < 10; iSample++) {
+      for (int iSample = 0; iSample < N_for_rms; iSample++) {
         float value = ( int( (*itdigi) [iSample] ) & 0xFFF );
         sum_square += (value*value) ;
         sum        +=  value ;
       }
-      _rms_EE[ ((EEDetId&)((*itdigi))).hashedIndex() ] =  sqrt(sum_square/10. - sum/10.*sum/10.);
-      //    std::cout << " rms ee = " << sqrt(sum_square/10. - sum/10.*sum/10.) << std::endl;   
-      
+      _rms_EE[ ((EEDetId&)((*itdigi))).hashedIndex() ] =  sqrt(sum_square/N_for_rms - sum/N_for_rms*sum/N_for_rms);
       _histo_0_rms_EE[ ((EEDetId&)((*itdigi))).hashedIndex() ] -> Fill (  ( int( (*itdigi) [0] ) & 0xFFF ) );    
       
     }
