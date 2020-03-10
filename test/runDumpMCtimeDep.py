@@ -59,7 +59,7 @@ process.TreeProducerNoise = cms.EDAnalyzer('TreeProducerNoise',
                             # 
                             #
                             
-                            runEvery = cms.untracked.int32 (1),
+                            runEvery = cms.untracked.int32 (10),
                             
                             #
                             #
@@ -69,11 +69,11 @@ process.TreeProducerNoise = cms.EDAnalyzer('TreeProducerNoise',
                             EcalRecHitsEBCollection = cms.InputTag("ecalRecHit",  "EcalRecHitsEB"),
                             EcalRecHitsEECollection = cms.InputTag("ecalRecHit",  "EcalRecHitsEE"),
 
-                            EBDigiCollection = cms.InputTag("ecalDigis",  "ebDigis"),
-                            EEDigiCollection = cms.InputTag("ecalDigis",  "eeDigis"),
+                            #EBDigiCollection = cms.InputTag("ecalDigis",  "ebDigis"),
+                            #EEDigiCollection = cms.InputTag("ecalDigis",  "eeDigis"),
 
-                            #EBDigiCollection = cms.InputTag("selectDigi",  "selectedEcalEBDigiCollection"),
-                            #EEDigiCollection = cms.InputTag("selectDigi",  "selectedEcalEEDigiCollection"),
+                            EBDigiCollection = cms.InputTag("selectDigi",  "selectedEcalEBDigiCollection"),
+                            EEDigiCollection = cms.InputTag("selectDigi",  "selectedEcalEEDigiCollection"),
 
 # not what I want, but better than nothing
 #EBDigiCollection                      "selectDigi"                "selectedEcalEBDigiCollection"   "RECO"    
@@ -87,15 +87,15 @@ process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(50)
 
 
 process.source = cms.Source("PoolSource",
-                                fileNames = cms.untracked.vstring(options.inputFiles),
-                                #fileNames = cms.untracked.vstring(),
+                                #fileNames = cms.untracked.vstring(options.inputFiles),
+                                fileNames = cms.untracked.vstring(),
                                 secondaryFileNames = cms.untracked.vstring()
                                 )
 
 
-#list_inputFiles = open("samples_timedep.py","r")
-#for file_to_add in list_inputFiles:
-  #process.source.fileNames.append ( file_to_add )
+list_inputFiles = open("samples_timedep.py","r")
+for file_to_add in list_inputFiles:
+  process.source.fileNames.append ( file_to_add )
 
 
 
