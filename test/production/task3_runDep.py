@@ -102,8 +102,9 @@ process.RECOSIMoutput = cms.OutputModule("PoolOutputModule",
     splitLevel = cms.untracked.int32(0)
 )
 
-process.RECOSIMoutput .outputCommands.append('keep *_*_EBDigiCollection_*')
-process.RECOSIMoutput .outputCommands.append('keep *_*_EEDigiCollection_*')
+process.RECOSIMoutput .outputCommands.append('keep *_*_ebDigis_*')
+process.RECOSIMoutput .outputCommands.append('keep *_*_eeDigis_*')
+
 
 #
 # EBDigiCollection                      "ecalDigis"                 "ebDigis"         "PulseTree"   

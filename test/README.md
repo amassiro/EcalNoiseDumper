@@ -149,6 +149,11 @@ Time dependent MC
     
 
     
+    -> private rereco    
+    cmsRun runDumpMCtimeDep.py   outputFile=/tmp/amassiro/testBig.root  inputFiles=file:/tmp/amassiro/step3.root
+    
+
+    
     
     
     
