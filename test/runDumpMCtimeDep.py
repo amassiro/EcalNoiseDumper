@@ -93,7 +93,8 @@ process.source = cms.Source("PoolSource",
                                 )
 
 
-list_inputFiles = open("samples_timedep.py","r")
+#list_inputFiles = open("samples_timedep.py","r")
+list_inputFiles = open("samples_timedep_new.py","r")
 for file_to_add in list_inputFiles:
   process.source.fileNames.append ( file_to_add )
 

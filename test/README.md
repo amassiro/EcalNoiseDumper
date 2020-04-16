@@ -96,7 +96,18 @@ Time dependent MC
     
     
     
+    /RelValZEE_13UP18_RD/CMSSW_11_1_0_pre5-PUpmx25ns_110X_upgrade2018_realistic_v9_RD_Harvesting_6HS-v1/GEN-SIM-RECO
+    --> samples_timedep_new.py
+    cmsRun runDumpMCtimeDep.py   outputFile=/tmp/amassiro/testBig.root
+
+    
+    
+    
     TTree* tree = (TTree*) _file0->Get("TreeProducerNoise/tree")
+    tree ->Draw("LS:runNumber", "", "");
+
+    
+    
     tree ->Draw("LaserCorrection_EB:time", "(energy_EB>=0)", "");
     tree ->Draw("LaserCorrection_EB:runNumber", "(energy_EB>=0)", "");
     tree ->Draw("LaserCorrection_EB:runNumber", "(energy_EB>=0)", "colz");
